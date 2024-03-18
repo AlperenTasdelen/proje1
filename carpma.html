@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  
+
+    <link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+
+    <meta name="apple-mobile-web-app-title" content="CodePen">
+
+    <link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+
+    <link rel="mask-icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-b4b4269c16397ad2f0f7a01bcdf513a1994f4c94b8af2f191c09eb0d601762b1.svg" color="#111" />
+
+
+
+  
+    <script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-2c7831bb44f98c1391d6a4ffda0e1fd302503391ca806e7fcc7b9b87197aec26.js"></script>
+
+
+  <title>CodePen - Multiplication Game</title>
+
+    <link rel="canonical" href="https://codepen.io/lhines/pen/LZEQma">
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+  
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+  
+<style>
+body {
+  background-color: #028090;
+  font-family: 'Roboto', sans-serif;
+}
+
+#game {
+  float: clear;
+}
+
+.red-text {
+  color: #E71D36;
+}
+
+#question {
+  font-size: 3em;
+  color: #F45B69;
+}
+
+#play {
+  font-size: 3em;
+  background-color: #114B5F;
+  color: white;
+}
+
+#answer {
+  font-size: 3em;
+  background-color: #E4FDE1;
+  width: 50%;
+  opacity: 0.3;
+  border-radius: 5px;
+  border-bottom: 4px solid;
+  color: #456990;
+}
+
+#answer:focus {
+  background-color: #E4FDE1;
+  width: 50%;
+  color: #456990;
+  border: none;
+}
+
+#result {
+  font-size: 3em;
+  border: dashed;
+  margin-left: 10%;
+}
+
+#timer {
+  font-size: 3em;
+}
+
+#timerBar {
+ 
+  
+}
+
+#prize {
+  font-size: 3em;
+  color: #F45B69;
+}
+
+.sec0 {
+  width: 0%;
+}
+
+.sec1 {
+  width: 10%;
+}
+
+.sec2 {
+  width: 20%;
+}
+
+.sec3 {
+  width: 30%;
+}
+
+.sec4 {
+  width: 40%;
+}
+
+.sec5 {
+  width: 50%;
+}
+
+.sec6 {
+  width: 60%;
+}
+
+.sec7 {
+  width: 70%;
+}
+
+.sec8 {
+  width: 80%;
+}
+
+.sec9 {
+  width: 90%;
+}
+
+.sec10 {
+  width: 100%;
+}
+</style>
+
+  <script>
+  window.console = window.console || function(t) {};
+</script>
+
+  
+  
+</head>
+
+<body translate="no">
+  <div class="container-fluid">
+
+  <div id="controls">
+    <button onclick="startGame(); return false;" class="btn btn-default" id="play">Play Game!</button><span id="timer"></span><span id="result"></span>
+   
+
+  </div>
+
+  <div id="game">
+
+    <span id="question"></span>
+    <input type="number" id="answer">
+                             
+</div>
+                           
+ <div>
+  
+   <span id="prize"></span>
+</div>
+
+
+</div>
+  <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+      <script id="rendered-js" >
+var num1;
+var num2;
+var numCorrect = 0;
+var timeCount = 120 * 4;
+var intId = -1;
+
+function startGame() {
+  $("#answer").val("");
+  newQuestion();
+  timeCount = 120 * 4;
+  numCorrect = 0;
+  $("#result").hide();
+  $("#prize").hide();
+  $("#play").fadeOut(1000, function () {
+    $("#timer").show();
+    $("#game").show();
+    // $("#timeBar").fadeOut(10000, "linear" function(){});
+    //$("#timerBar").hide();
+  });
+
+  intId = setInterval(timed, 250);
+}
+
+$('#answer').keypress(function (e) {
+  if (e.which == 13) {
+    checkAnswer();
+    return false; //<---- Add this line
+  }
+});
+
+function checkAnswer() {
+  var ans = parseInt($("#answer").val());
+  if (ans === num1 * num2) {
+    numCorrect++;
+    $("#result").show();
+    $("#result").text("Correct:" + numCorrect);
+    $("#answer").val("");
+    newQuestion();
+  }
+}
+$(document).ready(function () {
+  $("#answer").hide();
+  $("#result").hide();
+  $("#timer").hide();
+  //$("#timerBar").hide();
+});
+
+function timed() {
+  var secs = Math.floor(timeCount / 4) % 60;
+  var mins = Math.floor(timeCount / 240);
+  $("#timer").text(mins + ":" + formatTime(secs));
+  if (timeCount === 0) {
+    endGame();
+  } else if (timeCount <= 3 * 4) {
+    $("#timer").addClass("red-text");
+  }
+  timeCount--;
+  var timeProgress = "" + timeCount / 480 * 100;
+  // var prevClass = "sec" + ((Math.ceil(timeCount / 12)) + 1);
+  // var currClass = "sec" + (Math.ceil(timeCount / 12));
+  // $("#timerBar").removeClass(prevClass);
+  //$("#timerBar").addClass(currClass);
+  $("#timerBar").css('width', timeProgress + "%"); //$("timerBar").removeClass("s10").addClass("s0", 3000, "linear");
+  console.log(timeProgress + " " + prevClass + " " + currClass);
+  // $( "#timerBar").css("width", timeProgress + "%;");
+  //$("#timerBar").val("" + 10*timeCount);
+}
+
+function newQuestion() {
+
+  num1 = Math.round(Math.random() * 12);
+  num2 = Math.round(Math.random() * 12);
+  $("#question").text(num1 + "x" + num2 + "=");
+  $("#answer").show();
+}
+
+function endGame() {
+  $("#game").hide();
+  $("#timer").hide();
+  showPrize();
+  //$("#timerBar").hide();
+  $("#timer").removeClass("red-text");
+  clearInterval(intId);
+  $("#play").fadeIn(1000, function () {});
+
+}
+
+function formatTime(toFormat) {
+  if (toFormat < 10) {
+    return "0" + toFormat;
+  }
+  return toFormat;
+}
+
+function showPrize() {
+  $("#prize").show();
+  if (numCorrect == 0) {
+    $("#prize").text("No prize for you!");
+  } else
+  if (numCorrect > 10) {
+    $("#prize").text("You win a blue and green goose!");
+  } else
+  if (numCorrect > 20) {
+    $("#prize").text("You win a bar of soap!");
+  } else
+  if (numCorrect > 30) {
+    $("#prize").text("You win a sour cream and spinach pizza!");
+  } else
+  {
+    $("#prize").text("You win a polka-dotted bowling ball!");
+  }
+}
+//# sourceURL=pen.js
+    </script>
+
+  
+</body>
+
+</html>

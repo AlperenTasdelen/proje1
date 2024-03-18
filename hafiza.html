@@ -1,0 +1,452 @@
+
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+
+  <meta charset="UTF-8">
+  
+<link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+<meta name="apple-mobile-web-app-title" content="CodePen">
+
+<link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+
+<link rel="mask-icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+
+
+  <title>CodePen - My own Memory Game</title>
+  
+  
+  
+  
+<style>
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #ffffff url("../img/geometry2.png"); /* Background pattern from Subtle Patterns */
+  font-family: "Coda", cursive;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+h1 {
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+}
+
+/*
+ * Styles for the deck of cards
+ */
+
+.deck {
+  width: 320px;
+  min-height: 320px;
+  background: linear-gradient(160deg, #02ccba 0%, #cd837e 100%);
+  padding: 32px;
+  border-radius: 10px;
+  box-shadow: 12px 15px 20px 0 rgba(46, 61, 73, 0.5);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 3em;
+}
+
+.deck .card {
+  height: 60px;
+  width: 60px;
+  background: #2e3d49;
+  font-size: 0;
+  color: #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
+}
+
+.deck .card.open {
+  transform: rotateY(0);
+  background: #02b3e4;
+  cursor: default;
+}
+
+.deck .card.show {
+  font-size: 33px;
+}
+
+.deck .card.match {
+  cursor: default;
+  background: #02ccba;
+  font-size: 33px;
+}
+
+/*
+ * Styles for the Score Panel
+ */
+
+.score-panel {
+  text-align: left;
+  width: 345px;
+  margin-bottom: 10px;
+}
+
+.score-panel .stars {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  margin: 0 5px 0 0;
+}
+
+.score-panel .stars li {
+  list-style: none;
+  display: inline-block;
+}
+
+.score-panel .restart {
+  float: right;
+  cursor: pointer;
+}
+</style>
+
+  
+  
+  
+  <script>
+  if (document.location.search.match(/type=embed/gi)) {
+    window.parent.postMessage("resize", "*");
+  }
+</script>
+
+
+</head>
+
+<body translate="no" >
+  <!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Matching Game</title>
+    <meta name="description" content="">
+    <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+    <link rel="stylesheet prefetch" href="https://fonts.googleapis.com/css?family=Coda">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Matching Game</h1>
+        </header>
+
+        <section class="score-panel">
+            <ul class="stars">
+                <li><i class="fa fa-star"></i></li>
+                <li><i class="fa fa-star"></i></li>
+                <li><i class="fa fa-star"></i></li>
+            </ul>
+
+            <span class="moves"></span> Moves
+            <div class="timer">
+                <label id="minutes">00</label>:<label id="seconds">00</label>
+            </div>
+            <div class="restart">
+                <i class="fa fa-repeat"></i>
+            </div>
+        </section>
+        
+        <ul id="deck" class="deck">
+            <li class="card">
+                <i class="fa fa-diamond"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-paper-plane-o"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-anchor"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-bolt"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-cube"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-anchor"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-leaf"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-bicycle"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-diamond"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-bomb"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-leaf"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-bomb"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-bolt"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-bicycle"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-paper-plane-o"></i>
+            </li>
+            <li class="card">
+                <i class="fa fa-cube"></i>
+            </li>
+        </ul>
+    </div>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="js/app.js"></script>
+    
+</body>
+
+</html>
+    <script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-1b93190375e9ccc259df3a57c1abc0e64599724ae30d7ea4c6877eb615f89387.js"></script>
+
+  
+      <script id="rendered-js" >
+/*
+ * Create a list that holds all of your cards
+ */
+/*Intialize Game
+
+  Html Element erstellen und auf Seite hinzufügen
+  Eventlistener hinzufügen
+  node Element / appendChild
+
+  Card compare
+  ->true
+     false
+  game win 
+  timer 
+  star 
+  resultmessage 
+  reset game
+  //cardstotal[i] 
+  //}
+  //console.log(cardstotal); 
+
+  /*
+   * Display the cards on the page
+   *   - shuffle the list of cards using the provided "shuffle" method below
+   *   - loop through each card and create its HTML<--
+   *   - add each card's HTML to the page
+  */
+
+
+//function createCards() {
+//  const deck = document.getElementsByClassName("deck");
+//var shuffeldCards = shuffle(deck);
+//console.log (shuffeldCards);
+//let cards = document.getElementsByClassName("card");
+//Parent Element
+// New List Item (<li>)
+//let newListItem= document.createElement('li');
+//newListItem.textContent = "banana"
+//console.log
+//  
+//function adding open cards to list of open cards
+//Function check match
+//
+// * set up the event listener for a card. If a card is clicked:
+// *  - display the card's symbol (put this functionality in another function that you call from this one)
+// *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
+// *  - if the list already has another card, check to see if the two cards match
+// *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
+// *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
+// *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
+// *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this on
+var tempstorage = [];
+const deck = document.querySelector('.deck');
+let moves = 0;
+let time = 0;
+this == EventTarget;
+let cardstotal = document.getElementsByClassName('card');
+const starList = document.getElementsByClassName("stars");
+let wins = 0;
+const movecounter = document.querySelector(".moves");
+cardstotal = Array.from(cardstotal);
+
+// Function to Restart the Game by Reloading the entire page
+function reloadPage() {
+  document.querySelector('.restart').addEventListener('click', event => {
+    location.reload();
+    console.log('works');
+  });
+};
+reloadPage();
+timer();
+
+// Immmer Funktion aufrufen nach dem erstellen sonst wird sie nicht ausgeführt
+//Strg+# für auskommentieren
+
+// Start Function für Timer beim laden der Seite oder beim ersten Klicken.
+//Auf die richtige Schreibweise von Methoden achten!!
+
+
+//timer function to mesure the time the player needed after laoding the page to finish the  memory game
+let second = 0;
+let minute = 0;
+
+function timer() {
+  let minutes = document.getElementById("minutes");
+  let seconds = document.getElementById("seconds");
+
+  time = setInterval(setTime, 1000);
+
+  function setTime() {
+    second += 1;
+    seconds.innerHTML = pad(second);
+    if (second == 60) {
+      second = 0;
+      minute += 1;
+      minutes.innerHTML = pad(minute);
+    }
+  }
+};
+
+function pad(val) {
+  let valString = val + "";
+  if (valString.length < 2) {
+    return "0" + valString;
+  } else {
+    return valString;
+  }
+};
+// Function which shows in a modal the results after all pairs are found with time required and star rating
+
+function finished() {
+  const matched = document.querySelectorAll('.match');
+  console.log(matched.length);
+  if (matched.length === 16) {
+    clearInterval(time);
+    swal("You finished the game!",
+    "Congratulations  You finished with" + starList.length + " stars " + "    " +
+    "Within" + minute + ":" + second + ". You did a great Job",
+    "success",
+    { button: "Play Again!" }).then(value => {
+      location.reload();
+    });
+  }
+};
+
+// Shuffle function from http://stackoverflow.com/a/2450976
+function shuffle(array) {
+  var currentIndex = array.length,temporaryValue,randomIndex;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  return array;
+};
+
+// Function to prepare the shuffeld deck
+
+function prepare() {
+  const newcarddeck = shuffle(cardstotal);
+  console.log(newcarddeck);
+  for (const card of newcarddeck) {
+    deck.appendChild(card);
+  }
+}
+prepare();
+
+function clickDeck() {
+  deck.addEventListener("click", function (e) {
+    if (!e.target.classList.contains("match") && !e.target.classList.contains('open') &&
+    !e.target.classList.contains('show') && e.target.classList.contains('card') && tempstorage.length < 2) {
+      e.target.classList.add("open", "show");
+      tempstorage.push(e.target);
+
+      if (tempstorage.length === 2) {
+        matchCheck(e);
+        moves = moves + 1;
+        movecounter.innerHTML = moves;
+        console.log(movecounter.innerHTML);
+        removeStar();
+        finished();
+      }
+    }
+  });
+
+}
+
+clickDeck();
+
+
+function matchCheck(e) {
+  if (tempstorage[0].innerHTML === tempstorage[1].innerHTML) {
+    tempstorage[1].classList.add("match");
+    tempstorage[0].classList.add("match");
+    tempstorage = [];
+    wins = wins + 1;
+  } else
+  {
+    setTimeout(() => {
+      tempstorage[0].classList.remove("open", "show");
+      tempstorage[1].classList.remove("open", "show");
+      tempstorage = [];
+    }, 1000);
+  }
+}
+
+function removeStar() {
+  if (moves === 20) {
+    stars = document.querySelector(".stars");
+    stars.innerHTML = '<li><i class="fa fa-star"></i></li> <li><i class="fa fa-star"></i></li>';
+  } else
+  if (moves >= 25) {
+    stars.innerHTML = '<li><i class="fa fa-star"></i></li>';
+  }
+}
+
+removeStar();
+//# sourceURL=pen.js
+    </script>
+
+  
+
+  <script src="https://cpwebassets.codepen.io/assets/editor/iframe/iframeRefreshCSS-4793b73c6332f7f14a9b6bba5d5e62748e9d1bd0b5c52d7af6376f3d1c625d7e.js"></script>
+</body>
+
+</html>
+ 
