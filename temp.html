@@ -105,19 +105,6 @@ button {
   float: none;
 }
 
-#scoreList {
-        max-height: 200px; /* Set maximum height for scrollability */
-        overflow-y: auto; /* Enable vertical scrolling */
-        border: 1px solid #ccc; /* Add border */
-        padding: 5px; /* Add padding */
-        font-size: 14px; /* Set font size */
-}
-
-#scoreList li {
-        list-style-type: none; /* Remove bullet points */
-        margin-bottom: 5px; /* Add some space between items */
-}
-
 /******* Pseudoclass Styles *******/
 
 /******* Layout Styles *******/
@@ -176,8 +163,6 @@ button {
         <input type="text" id="player-name" placeholder="Your Name" style = "font-size: 0.4em; width: 150px; height: 50px;">
         <button id="save-button" style = "font-size: 0.4em; width: 150px; height: 30px;">SAVE SCORE</button>
         <button id="restart-button">RESTART</button>
-        <h1>Score Tracker</h1>
-        <u1 id="scoreList"></u1>
       </div>
       
       
@@ -225,13 +210,53 @@ var resScreen = document.getElementById("result");
 var scoreScreen = document.getElementById("score");
 
 var playerName;
-let scores = [];
 
 var a, b, r, ir, chaos, isCorrect;
 var score = 0;
 var wrongAnswer = false;
 var correctClick = 0;
 // first, second, and result.
+
+gapi.load('client', init);
+
+function init() {
+  // Initialize the Google API client with your OAuth 2.0 credentials
+  gapi.client.init({
+    apiKey: 'AIzaSyD1p-zxI-mj95gny85lSfTnvfsImVs4hsY',
+    clientId: '261417286325-ft7omj1unmuufqapf2co3bhh5rmelntu.apps.googleusercontent.com',
+    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+    scope: 'https://www.googleapis.com/auth/drive.file',
+  }).then(function() {
+    // Authenticate and authorize the user
+    return gapi.auth2.getAuthInstance().signIn();
+  }).then(function() {
+    // Once authenticated, you can interact with the Drive API
+    appendDataToFile('https://docs.google.com/spreadsheets/d/1S1pkfxvsHo6HMvC2qSkWbzxmAbVjXRNXup0bY0jlOqQ/edit?usp=sharing', 'playerName', 'score');
+  }).catch(function(error) {
+    console.error('Error initializing Google API client:', error);
+  });
+}
+
+  function appendDataToFile(fileId, playerName, score) {
+  // Construct the request body with the data to be appended
+  const requestData = {
+    mimeType: 'text/csv',
+    fileId: fileId,
+    media: {
+      mimeType: 'text/csv',
+      body: playerName + ',' + score + '\n',
+    },
+  };
+
+  // Call the Drive API to append data to the file
+  gapi.client.drive.files.create({
+    resource: requestData,
+  }).then(function(response) {
+    console.log('Data appended successfully:', response);
+  }).catch(function(error) {
+    console.error('Error appending data:', error);
+  });
+}
 
 // Helper function to create a random member
 function randomExpressionMember() {
@@ -360,44 +385,31 @@ restartButton.addEventListener("click", function () {
 savescoreButton.addEventListener("click", function () {
   playerName = document.getElementById("player-name").value;
   
-  let playerIndex = scores.findIndex(item => item.name === playerName);  
-  if (playerIndex === -1) {
-    boxDescription.textContent = "Your score is savedaaa!";
-    scores.push({name: playerName, score: resultScore});
-  }
-  // Check if the player is already in the list
-  else {
-    if (resultScore > scores[playerIndex].score) {
-      scores[playerIndex].score = resultScore;
-      boxDescription.textContent = "Score is found inside the list and updated!";
-    }
-    else {
-      boxDescription.textContent = "Your score is not high enough to be saved!";
-    }
-  }
+  //TODO: name and score is saved to the database.
+  var csvRow = playerName + "," + resultScore + "\n";
 
-  let csvContent = "data:text/csv;charset=utf-8,";
-  csvContent += "Name,Score\n";
+  //init();
 
-  scores.forEach(item => {
-        csvContent += `${item.name},${item.score}\n`;
-  });
+  //appendDataToFile('1S1pkfxvsHo6HMvC2qSkWbzxmAbVjXRNXup0bY0jlOqQ', playerName, resultScore);
 
-  // Create a link element and trigger download
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "myscores.csv");
-  document.body.appendChild(link); // Required for FF
-  link.click();
+  //var blob = new Blob([csvRow], { type: "text/csv" });
 
-  const scoreList = document.getElementById("scoreList");
-  scoreList.innerHTML = "";
-  scores.forEach(score => {
-    const li = document.createElement("li");
-    li.textContent = `${score.name}: ${score.score}`;
-    scoreList.appendChild(li);
-  });
+  //var a = document.createElement("a");
+  //a.href = URL.createObjectURL(blob);
+
+  //a.download = "toplamascores.csv";
+
+  //document.body.appendChild(a);
+
+  //a.click();
+
+  //URL.revokeObjectURL(a.href);
+
+  //document.body.removeChild(a);
+
+  //a.remove();
+
+  boxDescription.textContent = "Your score is saved!";
 
 }, false);
 
@@ -434,4 +446,3 @@ runGame();
 </body>
 
 </html>
- 
